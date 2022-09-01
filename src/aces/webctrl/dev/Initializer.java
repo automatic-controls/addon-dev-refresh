@@ -15,46 +15,42 @@ public class Initializer implements ServletContextListener {
       addons = info.getPrivateDir().toPath().getParent().getParent().getParent().getParent().getParent().resolve("addons").normalize();
       thread = new Thread(){
         @Override public void run(){
-          try{
-            String addonName;
-            Path addon;
-            while (go){
-              try{
-                try(
-                  DirectoryStream<Path> stream = Files.newDirectoryStream(addons);
-                ){
-                  for (Path p:stream){
-                    try{
-                      addonName = p.getFileName().toString();
-                      if (addonName.endsWith(".update")){
-                        addonName = addonName.substring(0,addonName.length()-7);
-                        if (!addonName.equals(name)){
-                          addon = addons.resolve(addonName+".addon");
-                          if (!Files.exists(addon) || HelperAPI.disableAddon(addonName)){
-                            try{
-                              Files.move(p,addon,StandardCopyOption.REPLACE_EXISTING);
-                            }catch(Throwable t){
-                              continue;
-                            }
-                            if (Files.exists(addon)){
-                              HelperAPI.enableAddon(addonName);
-                              HelperAPI.activateWebOperatorProvider(addon);
-                            }
+          String addonName;
+          Path addon;
+          while (go){
+            try{
+              try(
+                DirectoryStream<Path> stream = Files.newDirectoryStream(addons);
+              ){
+                for (Path p:stream){
+                  try{
+                    addonName = p.getFileName().toString();
+                    if (addonName.endsWith(".update")){
+                      addonName = addonName.substring(0,addonName.length()-7);
+                      if (!addonName.equals(name)){
+                        addon = addons.resolve(addonName+".addon");
+                        if (!Files.exists(addon) || HelperAPI.disableAddon(addonName)){
+                          try{
+                            Files.move(p,addon,StandardCopyOption.REPLACE_EXISTING);
+                          }catch(Throwable t){
+                            continue;
+                          }
+                          if (Files.exists(addon)){
+                            HelperAPI.enableAddon(addonName);
+                            HelperAPI.activateWebOperatorProvider(addon);
                           }
                         }
                       }
-                    }catch(Throwable t){
-                      t.printStackTrace();
                     }
+                  }catch(Throwable t){
+                    t.printStackTrace();
                   }
                 }
-              }catch(Throwable t){
-                t.printStackTrace();
               }
               Thread.sleep(3000);
+            }catch(InterruptedException e){}catch(Throwable t){
+              t.printStackTrace();
             }
-          }catch(InterruptedException e){}catch(Throwable t){
-            t.printStackTrace();
           }
         }
       };
