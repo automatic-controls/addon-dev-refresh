@@ -1,0 +1,6 @@
+<extension version="1">
+  <name>AddonDevRefresher</name>
+  <description>Streamlines add-on development by automatically removing and adding add-ons from a local WebCTRL server as they are developed.</description>
+  <version>1.0.0</version>
+  <vendor>Automatic Controls Equipment Systems, Inc.</vendor>
+</extension>
