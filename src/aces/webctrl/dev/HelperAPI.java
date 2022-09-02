@@ -4,6 +4,7 @@
   Contributors: Cameron Vogt (@cvogt729)
 */
 package aces.webctrl.dev;
+import java.io.*;
 import java.nio.file.*;
 import com.controlj.green.addonsupport.web.auth.AuthenticationManager;
 import com.controlj.green.extensionsupport.Extension;
@@ -66,6 +67,28 @@ public class HelperAPI {
         return false;
       }
       server.enableAddOn(addon);
+      return true;
+    }catch(Throwable t){
+      if (logErrors){ t.printStackTrace(); }
+      return false;
+    }
+  }
+  public static File getAddonsDirectory(){
+    try{
+      TomcatServer server = TomcatServerSingleton.get();
+      return server==null?null:server.getAddOnsDir();
+    }catch(Throwable t){
+      if (logErrors){ t.printStackTrace(); }
+      return null;
+    }
+  }
+  public static boolean deployAddon(File f){
+    try{
+      TomcatServer server = TomcatServerSingleton.get();
+      if (server==null){
+        return false;
+      }
+      server.deployAddOn(f);
       return true;
     }catch(Throwable t){
       if (logErrors){ t.printStackTrace(); }

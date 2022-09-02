@@ -2,6 +2,7 @@ package aces.webctrl.dev;
 import com.controlj.green.addonsupport.*;
 import javax.servlet.*;
 import java.nio.file.*;
+import java.io.*;
 public class Initializer implements ServletContextListener {
   public volatile AddOnInfo info;
   private volatile String name;
@@ -12,7 +13,14 @@ public class Initializer implements ServletContextListener {
     try{
       info = AddOnInfo.getAddOnInfo();
       name = info.getName();
-      addons = info.getPrivateDir().toPath().getParent().getParent().getParent().getParent().getParent().resolve("addons").normalize();
+      {
+        File f = HelperAPI.getAddonsDirectory();
+        if (f==null){
+          addons = info.getPrivateDir().toPath().getParent().getParent().getParent().getParent().getParent().resolve("addons").normalize();
+        }else{
+          addons = f.toPath().normalize();
+        }
+      }
       thread = new Thread(){
         @Override public void run(){
           String addonName;
@@ -31,13 +39,13 @@ public class Initializer implements ServletContextListener {
                         addon = addons.resolve(addonName+".addon");
                         if (!Files.exists(addon) || HelperAPI.disableAddon(addonName)){
                           try{
-                            Files.move(p,addon,StandardCopyOption.REPLACE_EXISTING);
+                            Files.copy(p,addon,StandardCopyOption.REPLACE_EXISTING);
                           }catch(Throwable t){
                             continue;
                           }
-                          if (Files.exists(addon)){
-                            HelperAPI.enableAddon(addonName);
+                          if (HelperAPI.enableAddon(addonName) || HelperAPI.deployAddon(addon.toFile())){
                             HelperAPI.activateWebOperatorProvider(addon);
+                            Files.deleteIfExists(p);
                           }
                         }
                       }
