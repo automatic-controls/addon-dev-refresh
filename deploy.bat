@@ -20,9 +20,9 @@ if "!name!" EQU "AddonDevRefresher" (
   echo Deployment unsuccessful.
   exit /b 1
 )
-if not exist "%WebCTRL%\addons" mkdir "%WebCTRL%\addons" >nul 2>nul
-copy /y "%certFile%" "%WebCTRL%\addons\%certFileName%" >nul
-copy /y "%addonFile%" "%WebCTRL%\addons\!name!.update" >nul
+if not exist "%WebCTRL%\programdata\addons" mkdir "%WebCTRL%\programdata\addons" >nul 2>nul
+copy /y "%certFile%" "%WebCTRL%\programdata\addons\%certFileName%" >nul
+copy /y "%addonFile%" "%WebCTRL%\programdata\addons\!name!.update" >nul
 if %ErrorLevel% NEQ 0 (
   echo Deployment unsuccessful.
   exit /b 1
@@ -31,7 +31,7 @@ set /a count=0
 :waitUpdate
 timeout 1 /nobreak >nul
 set /a count+=1
-if exist "%WebCTRL%\addons\!name!.update" (
+if exist "%WebCTRL%\programdata\addons\!name!.update" (
   if "%count%" EQU "60" (
     echo Timeout occurred.
     echo Deployment unsuccessful.
@@ -40,7 +40,7 @@ if exist "%WebCTRL%\addons\!name!.update" (
     goto :waitUpdate
   )
 )
-if exist "%WebCTRL%\addons\!name!.addon" (
+if exist "%WebCTRL%\programdata\addons\!name!.addon" (
   echo Deployment successful.
   exit /b 0
 ) else (
